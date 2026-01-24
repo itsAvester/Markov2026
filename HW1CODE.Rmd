@@ -1,0 +1,63 @@
+---
+title: "MARKOV HW1"
+author: "Averey Copeland"
+date: "2026-01-24"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(knitr)
+library(tinytex)
+library(tidyverse)
+library(boot)
+f <- function(x)x^4/(1+x^6)
+
+
+xvals <- seq(1,5,by = 0.1)
+#Log Scale
+Ns <- floor(10^xvals)
+
+#integral
+I_true <- integrate(function(x) 1/(1+x^6), lower=1, upper=Inf)$value
+
+estimate <- function(N) {
+  u <- runif(N)
+  v <- runif(N)
+  #square has area 1
+  mean(v <= f(x))   
+}
+df <- data.frame(N=Ns, E=E)
+
+E <- sapply(Ns, mc_estimate)
+ggplot(df, aes(x=N, y=E)) +
+  geom_point() +
+  geom_line() +
+  scale_x_log10() +
+  geom_hline(yintercept=I_true) +
+  labs(x = "N", y = "E(N)")
+
+```
+```{r}
+N <- 100000
+
+# Uniform(0,1) arrival times
+x1 <- runif(N)
+x2 <- runif(N)
+x3 <- runif(N)
+
+# All 3 arrived
+T <- pmax(x1,x2,x3)
+
+df <- data.frame(T=T)
+
+ggplot(df, aes(x = T)) +
+  geom_histogram(aes(y = after_stat(density)), bins=50) +
+  stat_function(fun = function(t) 3*t^2, xlim = c(0, 1)) +
+  labs(x="T", y="Density")
+
+```
+
