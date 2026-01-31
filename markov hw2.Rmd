@@ -1,0 +1,153 @@
+---
+title: "Markov 2"
+author: "Averey Copeland"
+date: "2026-01-31"
+output: pdf_document
+---
+```{r setup, include=FALSE,warning=FALSE,message=FALSE}
+library(knitr)
+library(tinytex)
+library(tidyverse)
+```
+```{r}
+#set gamma and x0 equal to values
+g<- 4
+x0<-10
+#make so pdf=1
+C<-(g-1)*x0^(g-1)
+#Inverse sampling
+N=100
+u<-runif(N)
+x<-x0*(1-u)^(-1/(g-1))
+
+#Generates theoritcal pdf and historgram
+hist(x, prob = TRUE, breaks = 50, xlim = c(0, 60),
+     main = paste("N = 100"), xlab = "x")
+curve(ifelse(x<x0, 0, C*x^(-g)), add = TRUE, lwd = 2)
+
+```
+```{r}
+#set gamma and x0 equal to values
+g<- 4
+x0<-10
+#make so pdf=1
+C<-(g-1)*x0^(g-1)
+#Inverse sampling
+N=1000
+u<-runif(N)
+x<-x0*(1-u)^(-1/(g-1))
+
+#Generates theoritcal pdf and historgram
+hist(x, prob = TRUE, breaks = 50, xlim = c(0, 60),
+     main = paste("N = 1000"), xlab = "x")
+curve(ifelse(x<x0, 0, C*x^(-g)), add = TRUE, lwd = 2)
+
+```
+```{r}
+#set gamma and x0 equal to values
+g<- 4
+x0<-10
+#make so pdf=1
+C<-(g-1)*x0^(g-1)
+#Inverse sampling
+N=10000
+u<-runif(N)
+x<-x0*(1-u)^(-1/(g-1))
+
+#Generates theoritcal pdf and historgram
+hist(x, prob = TRUE, breaks = 50, xlim = c(0, 60),
+     main = paste("N = 10,000"), xlab = "x")
+curve(ifelse(x<x0, 0, C*x^(-g)), add = TRUE, lwd = 2)
+
+```
+
+```{r}
+#10^6 = 1 million samples
+N <- 1000000
+
+#Newtons method, gives gamma values w/ 25 iterations (wasnt sure which number to pick, 25 seemed safe)
+newton <- function(u) {
+  #forces positive root guess
+  x <- pmax(-log1p(-u), 1e-12)
+  #This is where the iterations are set
+  for (k in 1:25) {
+    ex <- exp(-x)
+    g  <- 1-(1+x)*ex-u
+    gp <- x * ex
+    #Newton update
+    x  <- pmax(x-g/gp, 1e-12)
+  }
+  x
+}
+#Keeps track of runtime
+runtime <- system.time({
+  c <- runif(N)
+  f <- newton(u)
+})
+runtime
+
+```
+```{r}
+#10^6 = 1 million samples
+N <- 1000000
+#Best c value (wont let you use e as a number in r for some reason)
+c <- 4/exp(1)
+#Acceptance rate 1/c
+Accept <- exp(1)/4
+#System runtime
+time <- system.time({
+  #out <- numeric(N)
+  #Counter of samples so far
+  i <- 0
+  while (i < N) {
+    #Rounds up expected amount drawn in the given loop
+    m <- ceiling((N-i)/acc_rate)
+    #Draws n amount
+    y <- rexp(n, rate=0.5)
+    #uniforms for accept/reject
+    u <- runif(n)
+    #Accept prob
+    a <- (exp(1)/2)*y*exp(-y/2)
+    #Keeps accepted samples
+    keep <- y[u <= a]
+    #loops through accepted values until 1,000,000 reached
+    for (val in keep) {
+      if (i < N) {
+        #saves how many we have kept
+        i <- i+1
+        #Saves value in out
+        out[i] <- val
+      }
+    }
+  }
+  values <- out
+})
+time
+
+c
+Accept
+
+```
+```{r}
+#N=1 million
+N <- 1000000
+#Times the runtime
+time <- system.time({
+  #Adds the exponentials
+  x_d <- rexp(N, rate=1)+rexp(N, rate=1)
+})
+time
+
+```
+```{r}
+N <- 1000000
+
+#adds exponentials
+x <- rexp(N, rate = 1) + rexp(N, rate = 1)
+#histogram
+hist(x, prob = TRUE, breaks = 60,
+     main = "Gamma(2,1)",
+     xlab = "x")
+curve(x*exp(-x), from=0, to=max(x), add=TRUE, lwd=2)
+```
+
