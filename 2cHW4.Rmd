@@ -1,0 +1,34 @@
+---
+title: "2cHW4"
+author: "Averey Copeland"
+date: "2026-02-11"
+output: pdf_document
+---
+
+```{r}
+pb <- 1/10
+ps <- 9/10
+P <- matrix(0, nrow = 6, ncol = 6)
+#Manually entered values to create matrix
+cat(choose(2,1)*(ps^1)*(pb^(1)))
+
+P[1,]=c(0,0,0,0,0,1)
+P[2,]=c(1/10,9/10,0,0,0,0)
+P[3,]=c(1/100, .18 ,81/100,0,0,0)
+P[4,]=c(1/1000,0.02700, 0.2430, 0.7290, 0,0)
+P[5,]=c(1/10000, 0.00360, 0.0486, 0.2916, 0.65610,0)
+P[6,]=c(1/100000, 0.00045, 0.0081, 0.0729, 0.32805, 0.59049)
+
+#UNSURE HOW TO SOLVE B
+
+#C
+#TRANSPOSE EIGENVECTOR SO IT SOLVES PI^T IS EIG VECTOR OF P^T THAT EQUALS 1
+e <- eigen(t(P))
+#Normalize
+pi <- eig$vectors[,1] / sum(eig$vectors[,1])
+
+#Exactly 1 works (second pi value)
+pi[2]  
+
+```
+
